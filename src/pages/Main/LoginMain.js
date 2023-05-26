@@ -10,7 +10,7 @@ import Promise from '../../components/Promise'
 import SmallButtonItem from '../../components/SmallButtonItem'
 import Container from '../../components/Container'
 import { useNavigate } from 'react-router-dom'
-import React from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios'
 import { ResponseError } from '../../utils/error'
 import MoneyInfo from './LoginMain/MoneyInfo'
@@ -22,6 +22,7 @@ import HelpModal, { Content, SmallContent } from '../../components/HelpModal'
 import ExpireModal from '../../components/ExpireModal'
 import { freeLoading, setLoading } from '../../utils/reducers/loadingState'
 import Loading from '../../components/Loading'
+import useHttp from '../../hooks/use-http'
 
 function LoginMain() {
   const { token, uuid } = useSelector(state => state.loginState)
@@ -46,52 +47,69 @@ function LoginMain() {
     return [day, Math.floor((diff / 60) % 24), Math.floor(diff % 60)]
   }
 
-  const fetch = React.useCallback(
-    async (token, uuid) => {
-      try {
-        dispatch(setLoading())
-        const res = await axios.get(`/api/rabbit/mypage/${uuid}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        dispatch(freeLoading())
-        switch (res.status) {
-          case 200:
-            dispatch(
-              setInfo(
-                res.data.result.wish,
-                res.data.result.money,
-                res.data.result.custom
-              )
-            )
-            setTime(new Date(res.data.result.currentDateTime))
-            break
-          default:
-            throw new ResponseError('잘못된 응답입니다.', res)
-        }
-      } catch (err) {
-        const res = err.ResponseError
-        dispatch(freeLoading())
-        switch (res.status) {
-          case 401:
-            alert('세션이 만료되었습니다. 다시 로그인해주세요.')
-            dispatch(logout())
-            window.location.reload()
-            break
-          case 404:
-            alert(`${res.data.result.message}`)
-            dispatch(logout())
-            window.location.reload()
-            break
-          default:
-            alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
-            navigate('/')
-        }
-      }
-    },
-    [dispatch]
-  )
+  const { isLoading, error, fetch} = useHttp();
+  const [ userData, setUserData ] = useState({
+    wish: null, moneny: null
+  });
+
+  useEffect(() => {
+  
+
+    fetch(`/api/rabbit/mypage/${uuid}`, 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+      },
+      setUserData
+    });
+  }, []);
+
+  // const fetch = React.useCallback(
+  //   async (token, uuid) => {
+  //     try {
+  //       dispatch(setLoading())
+  //       const res = await axios.get(`/api/rabbit/mypage/${uuid}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       })
+  //       dispatch(freeLoading())
+  //       switch (res.status) {
+  //         case 200:
+  //           dispatch(
+  //             setInfo(
+  //               res.data.result.wish,
+  //               res.data.result.money,
+  //               res.data.result.custom
+  //             )
+  //           )
+  //           setTime(new Date(res.data.result.currentDateTime))
+  //           break
+  //         default:
+  //           throw new ResponseError('잘못된 응답입니다.', res)
+  //       }
+  //     } catch (err) {
+  //       const res = err.ResponseError
+  //       dispatch(freeLoading())
+  //       switch (res.status) {
+  //         case 401:
+  //           alert('세션이 만료되었습니다. 다시 로그인해주세요.')
+  //           dispatch(logout())
+  //           window.location.reload()
+  //           break
+  //         case 404:
+  //           alert(`${res.data.result.message}`)
+  //           dispatch(logout())
+  //           window.location.reload()
+  //           break
+  //         default:
+  //           alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
+  //           navigate('/')
+  //       }
+  //     }
+  //   },
+  //   [dispatch]
+  // )
 
   React.useEffect(() => {
     fetch(token, uuid)
