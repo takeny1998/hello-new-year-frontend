@@ -1,0 +1,43 @@
+html {
+  font-size: 1vw !important;
+
+  /* Colors ----------------------------- */
+  --white: #fff;
+
+  --light-100: #fafafa;
+  --light-200: #f3f2f2;
+  --light-300: #ebebeb;
+  --light-400: #ededed;
+  --light-500: #dddcdc;
+  --light-600: #d4d4d4;
+  --light-700: #a1a1a1;
+  --light-800: #7c7c7c;
+
+  --brown: #7c7364;
+  --brown-100: #7c736450;
+
+  --pink-50: #f7dad4;
+  --pink-100: #e8d3d1;
+  --pink-200: #ffc4bc;
+  --pink-300: #ffada3;
+  --pink: #ff8778;
+  --pink-500: #ff8678;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-decoration-line: none !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: auto;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
