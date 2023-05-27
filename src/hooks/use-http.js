@@ -1,35 +1,44 @@
 import { useState } from "react";
 import { useCallback } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { ResponseError } from "../utils/error";
+import { logout } from "../utils/reducers/loginState";
 
 const useHttp = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const sendRequest = useCallback( async (url, requestOptions, applyData) => {
         setIsLoading(true);
         setError(null);
-
         try {
             const res = await fetch(
-                url,
-                requestOptions.method ? requestOptions.method : 'GET',
-                requestOptions.headers ? requestOptions.headers : {},
-                requestOptions.body ? JSON.stringify(requestOptions.body) : {},
+                url, {
+                method: requestOptions.method ? requestOptions.method : 'GET',
+                headers: requestOptions.headers ? requestOptions.headers : {},
+                body: requestOptions.body ? JSON.stringify(requestOptions.body) : null,
+                }
             );
             
             if (res.status !== 200) {
                 throw new ResponseError('잘못된 응답입니다.', res)
             }
 
-            const data = res.data.result;
-            applyData(data);
+            const data = await res.json();
+            applyData(data.result);
 
         } catch (err) {
-            const status = err.ResponseError.status
+            console.log(err)
+            const status = err.ResponseError.status;
+            const data = err.ResponseError.data;
             switch (status) {
                 case 401:
                 case 404:
-                    alert(`${res.data.result.message}`)
+                    alert(`${data.result.message}`)
                     dispatch(logout())
                     window.location.reload()
                     break

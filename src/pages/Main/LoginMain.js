@@ -6,11 +6,11 @@ import { Wrapper } from '../Main'
 
 import Logo from '../../components/Logo'
 import MaterialIcon from '../../components/MaterialIcon'
-import Promise from '../../components/Promise'
+import Promise from '../../components/wish/Promise'
 import SmallButtonItem from '../../components/SmallButtonItem'
 import Container from '../../components/Container'
 import { useNavigate } from 'react-router-dom'
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { ResponseError } from '../../utils/error'
 import MoneyInfo from './LoginMain/MoneyInfo'
@@ -23,6 +23,7 @@ import ExpireModal from '../../components/ExpireModal'
 import { freeLoading, setLoading } from '../../utils/reducers/loadingState'
 import Loading from '../../components/Loading'
 import useHttp from '../../hooks/use-http'
+import { CUSTOM_INIT_STATE } from '../../utils/constant'
 
 function LoginMain() {
   const { token, uuid } = useSelector(state => state.loginState)
@@ -47,80 +48,51 @@ function LoginMain() {
     return [day, Math.floor((diff / 60) % 24), Math.floor(diff % 60)]
   }
 
-  const { isLoading, error, fetch} = useHttp();
+  const { isLoading, error, sendRequest: fetch} = useHttp();
   const [ userData, setUserData ] = useState({
-    wish: null, moneny: null
+    currentDateTime: "2023-05-27 11:35:19",
+    custom: CUSTOM_INIT_STATE,
+    money: 0,
+    nickName: "",
+    wish: "",
   });
 
   useEffect(() => {
-  
+    const applyUserData = (data) => {
+      const [
+        wishFont,
+        wishColor,
+        rabbitColor,
+        rabbitAcc,
+      ] = data.custom.split(';');
+
+      const wishInfo = {
+        value: data.wish,
+        font: wishFont,
+        color: wishColor,
+      }
+
+      const rabbitInfo = {
+        color: rabbitColor,
+        acc: rabbitAcc,
+      }
+      setUserData({moneny: data.money, wish: wishInfo,  rabbit: rabbitInfo});
+    }
 
     fetch(`/api/rabbit/mypage/${uuid}`, 
       {
         headers: {
           Authorization: `Bearer ${token}`,
+        },
       },
-      setUserData
-    });
+      applyUserData
+    );
+  }, [uuid, token, fetch]);
+
+  useEffect(() => {
+
   }, []);
 
-  // const fetch = React.useCallback(
-  //   async (token, uuid) => {
-  //     try {
-  //       dispatch(setLoading())
-  //       const res = await axios.get(`/api/rabbit/mypage/${uuid}`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       })
-  //       dispatch(freeLoading())
-  //       switch (res.status) {
-  //         case 200:
-  //           dispatch(
-  //             setInfo(
-  //               res.data.result.wish,
-  //               res.data.result.money,
-  //               res.data.result.custom
-  //             )
-  //           )
-  //           setTime(new Date(res.data.result.currentDateTime))
-  //           break
-  //         default:
-  //           throw new ResponseError('잘못된 응답입니다.', res)
-  //       }
-  //     } catch (err) {
-  //       const res = err.ResponseError
-  //       dispatch(freeLoading())
-  //       switch (res.status) {
-  //         case 401:
-  //           alert('세션이 만료되었습니다. 다시 로그인해주세요.')
-  //           dispatch(logout())
-  //           window.location.reload()
-  //           break
-  //         case 404:
-  //           alert(`${res.data.result.message}`)
-  //           dispatch(logout())
-  //           window.location.reload()
-  //           break
-  //         default:
-  //           alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
-  //           navigate('/')
-  //       }
-  //     }
-  //   },
-  //   [dispatch]
-  // )
-
-  React.useEffect(() => {
-    fetch(token, uuid)
-    // const timer = setInterval(() => {
-    //   setTime(prev => new Date(prev.getTime() + 1000))
-    // }, 1000)
-
-    // return () => {
-    //   clearInterval(timer)
-    // }
-  }, [])
 
   React.useEffect(() => {
     getTImeDiff()
@@ -130,7 +102,7 @@ function LoginMain() {
   const navigate = useNavigate()
   return (
     <Container alt>
-      <ExpireModal />
+      {/* <ExpireModal /> */}
       {/* {parseInt(timeDiff[0]) === 0 &&
       parseInt(timeDiff[1]) === 0 &&
       parseInt(timeDiff[2]) === 0 ? (
@@ -164,7 +136,7 @@ function LoginMain() {
         </ButtonWrapper>
 
         <Wrapper gap={0.5}>
-          <Promise />
+          <Promise info={userData.wish} />
           <SmallTextButton onClick={() => setHelpOpen(true)}>
             혹시 설명이 필요하신가요? <Focus>도움말 열기</Focus>
           </SmallTextButton>
