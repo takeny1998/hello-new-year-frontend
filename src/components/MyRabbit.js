@@ -6,8 +6,9 @@ import Moon from './Moon'
 function MyRabbit({ info }) {
   const { color, acc } = info;
 
-  console.log("re-rendering rabbit");
-
+  /* TODO: Rabbit Component 재정리
+  현재 Rabbit, Moon이 정리되지 않아 Coponent 구조를 대대적으로 재정립해야 함
+  */
   return (
     <Container>
       <RabbitContainer>

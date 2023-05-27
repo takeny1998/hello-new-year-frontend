@@ -6,7 +6,6 @@ import React from 'react';
 
 function WishLabel({ info, changeHandler, editable = false}) {
 
-    console.log("re-redeing wish");
     const {value, font, color} = info;
 
     const onPressEnterHandler = (event) => {

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import ButtonItem from '../components/ButtonItem'
 import Container from '../components/Container'
 import Logo from '../components/Logo'
-import Promise from '../components/Promise'
 import {
   ACCESSORY_ICON_OPTION,
   FONT_COLOR_OPTION,
@@ -15,11 +14,7 @@ import {
 } from '../utils/constant'
 import { SmallText } from './InviteLetter'
 import { Wrapper } from './Main'
-import axios from 'axios'
-import { useDispatch, useSelector } from 'react-redux'
-import { ResponseError } from '../utils/error'
-import { logout } from '../utils/reducers/loginState'
-import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import MyRabbit from '../components/MyRabbit'
@@ -27,9 +22,9 @@ import setMetaTags from '../utils/meta'
 
 import BG1Icon from '../assets/images/i_bg1.png'
 import BG2Icon from '../assets/images/i_bg2.png'
-import { freeLoading, setLoading } from '../utils/reducers/loadingState'
 import useHttp from 'hooks/use-http'
 import { WishLabel } from 'features/wish'
+import { LoadingModal } from 'features/ui'
 
 function Custom() {
   React.useEffect(() => {
@@ -44,15 +39,11 @@ function Custom() {
 
   const { isFetchLoading, fetchError, sendRequest: fetch} = useHttp();
   const { isSubmitLodaing, submitError, sendRequest: submit} = useHttp();
-
+  
   useEffect(() => {
     const applyCustomData = (data) => {
       const [
-        wishFont,
-        wishColor,
-        rabbitColor,
-        rabbitAcc,
-        backgroundIndex
+        wishFont, wishColor, rabbitColor, rabbitAcc, backgroundIndex
       ] = data.custom.split(';');
 
       const wishInfo = {
@@ -137,6 +128,7 @@ function Custom() {
   }
 
   return (
+    <>
     <Container customBg={backgroundIndex}>
       <Wrapper gap={4}>
         <Logo sx={1.75} />
@@ -220,6 +212,7 @@ function Custom() {
       </Wrapper>
       <ButtonItem onClick={() => submitHandler()}> 커스텀</ButtonItem>
     </Container>
+    </>
   )
 }
 

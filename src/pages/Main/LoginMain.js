@@ -21,38 +21,30 @@ import MyRabbit from '../../components/MyRabbit'
 import { useLocation } from 'react-router-dom'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import HelpModal, { Content, SmallContent } from '../../components/HelpModal'
-import ExpireModal from '../../components/ExpireModal'
+
+
+
 import { freeLoading, setLoading } from '../../utils/reducers/loadingState'
 import Loading from '../../components/Loading'
 import useHttp from '../../hooks/use-http'
 import { CUSTOM_INIT_STATE, RABBIT_INIT_STATE, WISH_INIT_STATE } from '../../utils/constant'
+import { ButtonWrapper, LetterModal, LoadingModal } from 'features/ui'
 
 function LoginMain() {
   const { token, uuid } = useSelector(state => state.loginState)
-  const { state } = useLocation()
-  const [time, setTime] = React.useState(new Date())
-  const [timeDiff, setTimeDiff] = React.useState([0, 0, 0])
-
-  const [helpOpen, setHelpOpen] = React.useState(
-    state !== null ? state.isFirst : false
-  )
-
   const dispatch = useDispatch()
 
-  const getTImeDiff = React.useCallback(() => {
-    const newYear = new Date('2023-01-01 00:00:00')
-    setTimeDiff(formatTimeDIff(newYear.getTime() - time.getTime()))
-  }, [time])
-
-  const formatTimeDIff = timeDiff => {
-    const diff = Math.floor(timeDiff / 1000 / 60)
-    const day = Math.floor(diff / (24 * 60))
-    return [day, Math.floor((diff / 60) % 24), Math.floor(diff % 60)]
-  }
 
   const { isLoading, error, sendRequest: fetch} = useHttp();
+
+  const [isLetterOpen, setLetterOpen] = useState(true);
+
+  const letterHandler = () => {
+    setLetterOpen(false);
+  };
+
+
   const [ userData, setUserData ] = useState({
-    currentDateTime: "2023-05-27 11:35:19",
     money: 0,
     wish: WISH_INIT_STATE,
     rabbit: RABBIT_INIT_STATE,
@@ -91,15 +83,15 @@ function LoginMain() {
   }, [uuid, token]);
 
 
-  React.useEffect(() => {
-    getTImeDiff()
-  }, [time])
-  // console.log(timeDiff)
-  // console.log(timeDiff === [0, 0, 0])
   const navigate = useNavigate()
   return (
     <Container alt>
-      {/* <ExpireModal /> */}
+      {
+        isLoading && <LoadingModal />
+      }
+      {
+        isLetterOpen && <LetterModal onComfirm={letterHandler} />
+      }
       {/* {parseInt(timeDiff[0]) === 0 &&
       parseInt(timeDiff[1]) === 0 &&
       parseInt(timeDiff[2]) === 0 ? (
@@ -134,7 +126,7 @@ function LoginMain() {
 
         <Wrapper gap={0.5}>
           <WishLabel info={userData.wish} />
-          <SmallTextButton onClick={() => setHelpOpen(true)}>
+          <SmallTextButton onClick={() => {}}>
             혹시 설명이 필요하신가요? <Focus>도움말 열기</Focus>
           </SmallTextButton>
         </Wrapper>
@@ -160,11 +152,6 @@ function LoginMain() {
   )
 }
 
-const ButtonWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-`
 
 const Label = styled.div`
   width: 100%;

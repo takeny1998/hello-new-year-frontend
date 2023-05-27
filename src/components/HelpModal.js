@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import ButtonItem from './ButtonItem'
+import RabbitImg from 'assets/images/main.png'
 
 function HelpModal({ setModalOpen }) {
   const closeModal = () => setModalOpen(false)
