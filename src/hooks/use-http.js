@@ -24,28 +24,32 @@ const useHttp = () => {
                 }
             );
             
-            if (res.status !== 200) {
-                throw new ResponseError('잘못된 응답입니다.', res)
+            if (!res.ok) {
+                throw new ResponseError(res);
             }
-
-            const data = await res.json();
-            applyData(data.result);
+            
+            const resData = await res.json();
+            applyData(resData.result);
 
         } catch (err) {
-            console.log(err)
-            const status = err.ResponseError.status;
-            const data = err.ResponseError.data;
-            switch (status) {
-                case 401:
-                case 404:
-                    alert(`${data.result.message}`)
-                    dispatch(logout())
-                    window.location.reload()
-                    break
+            /*
+                TODO: 404 not found (객체 리소스 없음, URL 없음) 에 대해서
+                Backend 개발자와 대화 필요
+
+                현재는 객체 리소스가 없는 경우, 해당 Uri 요청이 없는 경우 모두
+                404 not found를 반환하고 있음
+            */
+            switch(err.status) {
+                case 401: case 404: case 409:
+                    const errBody = await err.json();
+                    alert(errBody.message);
+                    break;
                 default:
-                    alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
-                    navigate('/')
+                    alert("서버와의 통신에 문제가 발생했습니다.");
+                    
             }
+            dispatch(logout());
+            navigate('/');
         }
 
         setIsLoading(false);

@@ -1,6 +1,5 @@
-export class ResponseError extends Error {
-  constructor(message, response) {
-    super(message)
-    this.response = response
+export class ResponseError {
+  constructor(res) {
+    this.res = res;
   }
 }
