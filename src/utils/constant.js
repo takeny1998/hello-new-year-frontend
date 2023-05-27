@@ -36,7 +36,16 @@ export const SITE_DESC = '2023년, 흑토끼의 묘한 편지함을 찾아오세
 
 export const API_ADDRESS = 'http://203.252.240.74:8080'
 
-export const WISH_INIT_STATE = '2023년엔 행복한 일만 가득하길'
+export const WISH_INIT_STATE = {
+  value: '2023년엔 행복한 일만 가득하길',
+  font: 1,
+  color: 1,
+}
+
+export const RABBIT_INIT_STATE = {
+  color: 2,
+  acc: 0,
+}
 
 export const CUSTOM_INIT_STATE = {
   wishFont: 1,

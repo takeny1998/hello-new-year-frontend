@@ -6,7 +6,9 @@ import { Wrapper } from '../Main'
 
 import Logo from '../../components/Logo'
 import MaterialIcon from '../../components/MaterialIcon'
-import Promise from '../../components/wish/Promise'
+
+import { WishLabel } from 'features/wish'
+
 import SmallButtonItem from '../../components/SmallButtonItem'
 import Container from '../../components/Container'
 import { useNavigate } from 'react-router-dom'
@@ -23,7 +25,7 @@ import ExpireModal from '../../components/ExpireModal'
 import { freeLoading, setLoading } from '../../utils/reducers/loadingState'
 import Loading from '../../components/Loading'
 import useHttp from '../../hooks/use-http'
-import { CUSTOM_INIT_STATE } from '../../utils/constant'
+import { CUSTOM_INIT_STATE, RABBIT_INIT_STATE, WISH_INIT_STATE } from '../../utils/constant'
 
 function LoginMain() {
   const { token, uuid } = useSelector(state => state.loginState)
@@ -51,10 +53,9 @@ function LoginMain() {
   const { isLoading, error, sendRequest: fetch} = useHttp();
   const [ userData, setUserData ] = useState({
     currentDateTime: "2023-05-27 11:35:19",
-    custom: CUSTOM_INIT_STATE,
     money: 0,
-    nickName: "",
-    wish: "",
+    wish: WISH_INIT_STATE,
+    rabbit: RABBIT_INIT_STATE,
   });
 
   useEffect(() => {
@@ -136,7 +137,7 @@ function LoginMain() {
         </ButtonWrapper>
 
         <Wrapper gap={0.5}>
-          <Promise info={userData.wish} />
+          <WishLabel info={userData.wish} />
           <SmallTextButton onClick={() => setHelpOpen(true)}>
             혹시 설명이 필요하신가요? <Focus>도움말 열기</Focus>
           </SmallTextButton>
