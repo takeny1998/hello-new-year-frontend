@@ -1,25 +1,19 @@
-import { useSelector } from 'react-redux'
+import React from 'react';
 import styled from 'styled-components'
 import { ACCESSORY_OPTION, RABBIT_OPTION } from '../utils/constant'
 import Moon from './Moon'
 
-function MyRabbit({ customRabbitColor, customRabbitAcc }) {
-  const { rabbitColor, rabbitAcc } = useSelector(state => state.infoState)
+function MyRabbit({ info }) {
+  const { color, acc } = info;
+
+  console.log("re-rendering rabbit");
 
   return (
     <Container>
       <RabbitContainer>
-        <Rabbit
-          src={
-            RABBIT_OPTION[
-              customRabbitColor !== undefined ? customRabbitColor : rabbitColor
-            ]
-          }
-        />
+        <Rabbit src={RABBIT_OPTION[color]} />
         {
-          ACCESSORY_OPTION[
-            customRabbitAcc !== undefined ? customRabbitAcc : rabbitAcc
-          ]
+          ACCESSORY_OPTION[acc]
         }
       </RabbitContainer>
       <MoonContainer>
@@ -55,4 +49,4 @@ const MoonContainer = styled.div`
   right: 0;
 `
 
-export default MyRabbit
+export default React.memo(MyRabbit);

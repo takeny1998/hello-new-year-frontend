@@ -77,7 +77,7 @@ function LoginMain() {
         color: rabbitColor,
         acc: rabbitAcc,
       }
-      setUserData({moneny: data.money, wish: wishInfo,  rabbit: rabbitInfo});
+      setUserData({money: data.money, wish: wishInfo,  rabbit: rabbitInfo});
     }
 
     fetch(`/api/rabbit/mypage/${uuid}`, 
@@ -88,11 +88,7 @@ function LoginMain() {
       },
       applyUserData
     );
-  }, [uuid, token, fetch]);
-
-  useEffect(() => {
-
-  }, []);
+  }, [uuid, token]);
 
 
   React.useEffect(() => {
@@ -145,7 +141,7 @@ function LoginMain() {
 
         <MoneyInfo />
 
-        <MyRabbit />
+        <MyRabbit info={userData.rabbit} />
 
         <Wrapper gap={2}>
           {/* <Label>

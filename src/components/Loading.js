@@ -11,7 +11,8 @@ import styled from 'styled-components'
 // `
 
 function Loading() {
-  const { isLoading } = useSelector(state => state.loadingState)
+  const isLoading = false;
+  // const { isLoading } = useSelector(state => state.loadingState)
   return (
     isLoading && (
       <AxiosLoading style={{ display: isLoading === true ? 'block' : 'none' }}>

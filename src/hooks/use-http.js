@@ -17,19 +17,25 @@ const useHttp = () => {
         setError(null);
         try {
             const res = await fetch(
-                url, {
-                method: requestOptions.method ? requestOptions.method : 'GET',
-                headers: requestOptions.headers ? requestOptions.headers : {},
-                body: requestOptions.body ? JSON.stringify(requestOptions.body) : null,
+                url, 
+                {
+                    method: requestOptions.method ? requestOptions.method : 'GET',
+                    headers: requestOptions.headers ? requestOptions.headers : {},
+                    body: requestOptions.body ? JSON.stringify(requestOptions.body) : null,
                 }
             );
-            
             if (!res.ok) {
                 throw new ResponseError(res);
             }
             
             const resData = await res.json();
-            applyData(resData.result);
+
+            if (requestOptions.method === 'POST') {
+                alert(resData.result.message);
+                window.location.reload();
+            } else {
+                applyData(resData.result);
+            }
 
         } catch (err) {
             /*

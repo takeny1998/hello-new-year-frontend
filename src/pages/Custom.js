@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import ButtonItem from '../components/ButtonItem'
 import Container from '../components/Container'
 import Logo from '../components/Logo'
@@ -9,7 +9,9 @@ import {
   FONT_OPTION,
   FONT_TYPO_OPTION,
   RABBIT_COLOR_OPTION,
+  RABBIT_INIT_STATE,
   SITE_NAME,
+  WISH_INIT_STATE,
 } from '../utils/constant'
 import { SmallText } from './InviteLetter'
 import { Wrapper } from './Main'
@@ -20,13 +22,14 @@ import { logout } from '../utils/reducers/loginState'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { setInfo } from '../utils/reducers/infoState'
 import MyRabbit from '../components/MyRabbit'
 import setMetaTags from '../utils/meta'
 
 import BG1Icon from '../assets/images/i_bg1.png'
 import BG2Icon from '../assets/images/i_bg2.png'
 import { freeLoading, setLoading } from '../utils/reducers/loadingState'
+import useHttp from 'hooks/use-http'
+import { WishLabel } from 'features/wish'
 
 function Custom() {
   React.useEffect(() => {
@@ -35,150 +38,121 @@ function Custom() {
 
   const { uuid, token } = useSelector(state => state.loginState)
 
-  const { wish, wishFont, wishColor, rabbitAcc, rabbitColor, background } =
-    useSelector(state => state.infoState)
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
+  const [wishInfo, setWishInfo] = useState(WISH_INIT_STATE);
+  const [rabbitInfo, setRabbitInfo] = useState(RABBIT_INIT_STATE);
 
-  const [wishValue, setWish] = React.useState('')
+  const { isFetchLoading, fetchError, sendRequest: fetch} = useHttp();
+  const { isSubmitLodaing, submitError, sendRequest: submit} = useHttp();
 
-  const [rabbitColorValue, setRabbitColor] = React.useState(2)
-  const [rabbitAccValue, setRabbitAcc] = React.useState(0)
+  useEffect(() => {
+    const applyCustomData = (data) => {
+      const [
+        wishFont,
+        wishColor,
+        rabbitColor,
+        rabbitAcc,
+        backgroundIndex
+      ] = data.custom.split(';');
 
-  const [fontValue, setFont] = React.useState(0)
-  const [fontColorValue, setFontColor] = React.useState(0)
+      const wishInfo = {
+        value: data.wish,
+        font: wishFont,
+        color: wishColor,
+      }
 
-  const [backgroundValue, setBackground] = React.useState(0)
+      const rabbitInfo = {
+        color: rabbitColor,
+        acc: rabbitAcc,
+      }
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+      setBackgroundIndex(backgroundIndex);
+      setWishInfo(wishInfo);
+      setRabbitInfo(rabbitInfo);
+    }
 
-  const fetch = React.useCallback(async () => {
-    try {
-      dispatch(setLoading())
-      const res = await axios.get(`/api/rabbit/mypage/${uuid}/custom`, {
+    fetch(
+      `/api/rabbit/mypage/${uuid}/custom`,
+      {
         headers: {
           Authorization: `Bearer ${token}`,
-        },
-      })
-
-      dispatch(freeLoading())
-      switch (res.status) {
-        case 200:
-          dispatch(
-            setInfo(
-              res.data.result.wish,
-              res.data.result.money,
-              res.data.result.custom
-            )
-          )
-          setWish(wish)
-          setFont(wishFont)
-          setFontColor(wishColor)
-          setRabbitColor(rabbitColor)
-          setRabbitAcc(rabbitAcc)
-          setBackground(background)
-          break
-        default:
-          throw new ResponseError('잘못된 응답입니다.', res)
-      }
-    } catch (err) {
-      const res = err.response
-
-      switch (res.status) {
-        case 401:
-          alert('세션이 만료되었습니다. 다시 로그인해주세요.')
-          dispatch(logout())
-          navigate('/login')
-          break
-
-        case 404:
-          console.log(res.data)
-          alert(`${res.data.result.message}`)
-          navigate('/')
-          break
-        default:
-          alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
-      }
-    }
+        }
+      },
+      applyCustomData
+    )
   }, [uuid, token])
 
-  const submit = React.useCallback(async () => {
-    try {
-      dispatch(setLoading())
-      const res = await axios.post(
-        `/api/rabbit/mypage/${uuid}/custom`,
-        {
-          wish: wishValue,
-          custom: `${fontValue};${fontColorValue};${rabbitColorValue};${rabbitAccValue};${backgroundValue}`,
+  const submitHandler = async () => {
+
+    submit(
+      `/api/rabbit/mypage/${uuid}/custom`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        body: {
+          wish: wishInfo.value,
+          custom: `${wishInfo.font};${wishInfo.color};${rabbitInfo.color};${rabbitInfo.acc};${backgroundIndex}`,
         }
-      )
-
-      dispatch(freeLoading())
-      switch (res.status) {
-        case 200:
-          alert('수정이 완료되었습니다.')
-          await fetch()
-          window.location.reload()
-          break
-
-        default:
-          throw new ResponseError('잘못된 응답입니다.', res)
       }
-    } catch (err) {
-      const res = err.response
-      dispatch(freeLoading())
-      switch (res.status) {
-        case 401:
-          alert('세션이 만료되었습니다. 다시 로그인해주세요.')
-          dispatch(logout())
-          navigate('/login')
-          break
+    )
+  }
 
-        case 404:
-          alert(`${res.data.result.message}`)
-          navigate('/')
-          break
-        default:
-          alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
-      }
-    }
-  }, [
-    wishValue,
-    fontValue,
-    fontColorValue,
-    rabbitAccValue,
-    rabbitColorValue,
-    backgroundValue,
-    token,
-    uuid,
-  ])
+  const backgroundChangeHandler = (value) => {
+    setBackgroundIndex(value);
+  }
 
-  React.useEffect(() => {
-    fetch()
-  }, [])
+
+  const wishColorChangeHandler = (value) => {
+    setWishInfo((prevState) => { 
+      return { ...prevState, color: value };
+    });
+  }
+
+  const wishFontChangeHandler = (value) => {
+    setWishInfo((prevState) => { 
+      return { ...prevState, font: value };
+    });
+  }
+
+  const wishValueChangeHandler = useCallback((event, ref) => {
+    setWishInfo((prevState) => {
+      return { ...prevState, value: event.target.innerText };
+    })
+  }, []);
+
+  
+  const rabbitColorChangeHandler = (value) => {
+    setRabbitInfo((prevState) => { 
+      return { ...prevState, color: value };
+    });
+  }
+
+  const rabbitAccChangeHandler = (value) => {
+    setRabbitInfo((prevState) => { 
+      return { ...prevState, acc: value };
+    });
+  }
 
   return (
-    <Container customBg={backgroundValue}>
+    <Container customBg={backgroundIndex}>
       <Wrapper gap={4}>
         <Logo sx={1.75} />
         <Option>
           <OptionLabel>배경화면</OptionLabel>
           <OptionWrapper>
-            <IconOption src={BG1Icon} onClick={() => setBackground(0)} />
-            <IconOption src={BG2Icon} onClick={() => setBackground(1)} />
+            <IconOption src={BG1Icon} onClick={() => backgroundChangeHandler(0)} />
+            <IconOption src={BG2Icon} onClick={() => backgroundChangeHandler(1)} />
           </OptionWrapper>
         </Option>
         <Wrapper gap={1.5}>
           <SmallText>2023년 새해 소망을 적어보세요!</SmallText>
-          <Promise
+          <WishLabel
+            info={wishInfo}
             editable={true}
-            setValue={setWish}
-            color={FONT_COLOR_OPTION[fontColorValue]}
-            font={FONT_OPTION[fontValue]}
+            changeHandler={wishValueChangeHandler}
           />
 
           <Wrapper gap={1}>
@@ -189,7 +163,7 @@ function Custom() {
                   <IconOption
                     key={index}
                     src={typo}
-                    onClick={() => setFont(index)}
+                    onClick={() => wishFontChangeHandler(index)}
                   />
                 ))}
               </OptionWrapper>
@@ -202,7 +176,7 @@ function Custom() {
                   <ColorOption
                     key={index}
                     color={color}
-                    onClick={() => setFontColor(index)}
+                    onClick={() => wishColorChangeHandler(index)}
                   />
                 ))}
               </OptionWrapper>
@@ -216,10 +190,7 @@ function Custom() {
             <br />달 위상은 보유한 용돈만큼 늘어납니다!
           </SmallText>
 
-          <MyRabbit
-            customRabbitColor={rabbitColorValue}
-            customRabbitAcc={rabbitAccValue}
-          />
+          <MyRabbit info={rabbitInfo} />
 
           <Option>
             <OptionLabel>색상</OptionLabel>
@@ -228,7 +199,7 @@ function Custom() {
                 <ColorOption
                   key={index}
                   color={color}
-                  onClick={() => setRabbitColor(index)}
+                  onClick={() => rabbitColorChangeHandler(index)}
                 />
               ))}
             </OptionWrapper>
@@ -240,14 +211,14 @@ function Custom() {
                 <IconOption
                   key={index}
                   src={icon}
-                  onClick={() => setRabbitAcc(index)}
+                  onClick={() => rabbitAccChangeHandler(index)}
                 />
               ))}
             </OptionWrapper>
           </Option>
         </Wrapper>
       </Wrapper>
-      <ButtonItem onClick={() => submit()}> 커스텀</ButtonItem>
+      <ButtonItem onClick={() => submitHandler()}> 커스텀</ButtonItem>
     </Container>
   )
 }
