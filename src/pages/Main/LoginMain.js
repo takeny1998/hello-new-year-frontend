@@ -35,7 +35,7 @@ function LoginMain() {
   const dispatch = useDispatch()
 
 
-  const { isLoading, error, sendRequest: fetch} = useHttp();
+  const { isLoading, sendRequest: fetch} = useHttp();
 
   const [isLetterOpen, setLetterOpen] = useState(true);
 
@@ -69,7 +69,7 @@ function LoginMain() {
         color: rabbitColor,
         acc: rabbitAcc,
       }
-      setUserData({money: data.money, wish: wishInfo,  rabbit: rabbitInfo});
+      setUserData({money: data.money, wish: wishInfo, rabbit: rabbitInfo});
     }
 
     fetch(`/api/rabbit/mypage/${uuid}`, 

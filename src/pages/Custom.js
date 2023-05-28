@@ -74,6 +74,10 @@ function Custom() {
   }, [uuid, token])
 
   const submitHandler = async () => {
+    const complete = ({ nickName }) => {
+      alert(`${nickName}님의 설정이 저장되었습니다.`);
+      window.location.reload();
+    }
 
     submit(
       `/api/rabbit/mypage/${uuid}/custom`,
@@ -87,7 +91,8 @@ function Custom() {
           wish: wishInfo.value,
           custom: `${wishInfo.font};${wishInfo.color};${rabbitInfo.color};${rabbitInfo.acc};${backgroundIndex}`,
         }
-      }
+      },
+      complete
     )
   }
 

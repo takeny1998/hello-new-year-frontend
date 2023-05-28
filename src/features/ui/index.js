@@ -2,12 +2,12 @@ import LoadingModal from "./modal/LoadingModal";
 import LetterModal from "./modal/LetterModal";
 
 import Button from "./Button/Button";
-import styled from "styled-components";
+import ButtonWrapper from "./Button/ButtonWrapper";
 
-const ButtonWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-`
+import Link from "./LinkWrapper";
 
-export {LoadingModal, LetterModal, Button, ButtonWrapper};
+export {
+  LoadingModal, LetterModal, 
+  Button, ButtonWrapper,
+  Link
+};
