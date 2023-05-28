@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Main from './pages/Main'
 import Login from './pages/Login'
 import CreateAccount from './pages/CreateAccount'
-import MyPage from './pages/MyPage'
 import TestCustomizing from './pages/TestCustomizing'
 import React from 'react'
 import LetterBox from './pages/LetterBox'
@@ -30,7 +29,6 @@ function App() {
         <Route path="/sign-up" element={<CreateAccount />} />
         <Route path="/letter-box" element={<LetterBox />} />
         <Route path="/letter-box/:id" element={<ReadLetter />} />
-        <Route path="/mypage" element={<MyPage />} />
         <Route path="/letter/:uuid" element={<InviteLetter />} />
         <Route path="/letter/:uuid/send" element={<SendLetter />} />
         <Route path="/custom" element={<Custom />} />
