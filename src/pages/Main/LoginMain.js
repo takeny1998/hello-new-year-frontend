@@ -29,13 +29,12 @@ import Loading from '../../components/Loading'
 import useHttp from '../../hooks/use-http'
 import { CUSTOM_INIT_STATE, RABBIT_INIT_STATE, WISH_INIT_STATE } from '../../utils/constant'
 import { ButtonWrapper, LetterModal, LoadingModal } from 'features/ui'
+import { useUserData } from 'features/users'
 
 function LoginMain() {
-  const { token, uuid } = useSelector(state => state.loginState)
+  const { uuid } = useSelector(state => state.loginState)
   const dispatch = useDispatch()
 
-
-  const { isLoading, sendRequest: fetch} = useHttp();
 
   const [isLetterOpen, setLetterOpen] = useState(true);
 
@@ -44,44 +43,47 @@ function LoginMain() {
   };
 
 
-  const [ userData, setUserData ] = useState({
-    money: 0,
-    wish: WISH_INIT_STATE,
-    rabbit: RABBIT_INIT_STATE,
-  });
+  //   money: 0,
+  //   wish: WISH_INIT_STATE,
+  //   rabbit: RABBIT_INIT_STATE,
+  // });
+
+  // useEffect(() => {
+  //   const applyUserData = (data) => {
+  //     const [
+  //       wishFont,
+  //       wishColor,
+  //       rabbitColor,
+  //       rabbitAcc,
+  //     ] = data.custom.split(';');
+
+  //     const wishInfo = {
+  //       value: data.wish,
+  //       font: wishFont,
+  //       color: wishColor,
+  //     }
+
+  //     const rabbitInfo = {
+  //       color: rabbitColor,
+  //       acc: rabbitAcc,
+  //     }
+  //     setUserData({money: data.money, wish: wishInfo, rabbit: rabbitInfo});
+  //   }
+
+  //   fetch(`/api/rabbit/mypage/${uuid}`, 
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     },
+  //     applyUserData
+  //   );
+  // }, [uuid, token]);
+  const { isLoading, userData, fetchUserData } = useUserData();
 
   useEffect(() => {
-    const applyUserData = (data) => {
-      const [
-        wishFont,
-        wishColor,
-        rabbitColor,
-        rabbitAcc,
-      ] = data.custom.split(';');
-
-      const wishInfo = {
-        value: data.wish,
-        font: wishFont,
-        color: wishColor,
-      }
-
-      const rabbitInfo = {
-        color: rabbitColor,
-        acc: rabbitAcc,
-      }
-      setUserData({money: data.money, wish: wishInfo, rabbit: rabbitInfo});
-    }
-
-    fetch(`/api/rabbit/mypage/${uuid}`, 
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-      applyUserData
-    );
-  }, [uuid, token]);
-
+    fetchUserData(uuid);
+  }, [uuid])
 
   const navigate = useNavigate()
   return (

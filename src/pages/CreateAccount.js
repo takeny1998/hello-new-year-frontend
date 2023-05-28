@@ -4,14 +4,13 @@ import { useNavigate } from 'react-router-dom'
 
 import { SubTitle, Wrapper } from './Main'
 
-import { Input, useForm, validateJoin } from 'features/users'
+import { BottomText, Input, useForm, validateJoin } from 'features/users'
 import { Button, Link, LoadingModal } from 'features/ui'
 
 import Logo from '../components/Logo'
 import Container from '../components/Container'
 import setMetaTags from '../utils/meta'
 import { SITE_NAME } from '../utils/constant'
-import { BottomText } from './Login'
 import useHttp from 'hooks/use-http'
 
 const JOIN_INIT_VALUES = {

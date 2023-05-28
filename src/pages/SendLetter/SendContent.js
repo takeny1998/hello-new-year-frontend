@@ -6,11 +6,11 @@ import Money5000 from '../../assets/images/money-5000.png'
 import Money1000 from '../../assets/images/money-1000.png'
 import styled from 'styled-components'
 import Letter from '../../components/Letter'
-import { Input } from '../Login'
 import ButtonItem from '../../components/ButtonItem'
 import Logo from '../../components/Logo'
 
 import MoneyButton from '../../components/MoneyButton'
+import { Input } from 'features/users'
 
 function SendContent({
   nickName,

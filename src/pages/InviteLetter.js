@@ -1,86 +1,50 @@
 import axios from 'axios'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import ButtonItem from '../components/ButtonItem'
 import Container from '../components/Container'
 import Logo from '../components/Logo'
-import Promise from '../components/Promise'
 import { Wrapper } from './Main'
-import { ResponseError } from '../utils/error'
-import { useDispatch, useSelector } from 'react-redux'
-import { setInfo } from '../utils/reducers/infoState'
 import MyRabbit from '../components/MyRabbit'
 import setMetaTags from '../utils/meta'
 import { SITE_NAME } from '../utils/constant'
-import { freeLoading, setLoading } from '../utils/reducers/loadingState'
+import { useUserData } from 'features/users'
+import { WishLabel } from 'features/wish'
+import { LoadingModal } from 'features/ui'
 
 function InviteLetter() {
   const { uuid } = useParams()
-  const [nickName, setNickname] = React.useState('')
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
 
-  const fetch = React.useCallback(async uuid => {
-    try {
-      dispatch(setLoading())
-      const res = await axios.get(`/api/rabbit/${uuid}`)
-      dispatch(freeLoading())
-      switch (res.status) {
-        case 200:
-          setNickname(res.data.result.nickName)
-          dispatch(
-            setInfo(
-              res.data.result.wish,
-              res.data.result.money,
-              res.data.result.custom
-            )
-          )
-          break
+  const { isLoading, userData, fetchUserData } = useUserData();
 
-        default:
-          throw new ResponseError('잘못된 응답입니다.', res)
-      }
-    } catch (err) {
-      const res = err.response
-      dispatch(freeLoading())
-
-      switch (res.status) {
-        case 404:
-          alert('해당 친구를 찾을 수 없습니다. 주소를 다시 확인해주세요.')
-          navigate('/')
-          break
-
-        default:
-          alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
-          navigate('/')
-      }
-    }
-  }, [])
+  useEffect(() => {
+    fetchUserData(uuid);
+  }, [uuid]);
 
   React.useEffect(() => {
-    fetch(uuid)
-  }, [])
-
-  React.useEffect(() => {
-    setMetaTags(`${nickName}님의 편지함 - ${SITE_NAME}`)
-  }, [nickName])
+    setMetaTags(`${userData.nickName}님의 편지함 - ${SITE_NAME}`)
+  }, [userData.nickName]);
 
   return (
+    <>
+    { isLoading && <LoadingModal />}
     <Container alt>
       <Wrapper gap={2}>
         <Logo sx={1.75} />
-        <SmallText>{nickName}님에게 응원의 편지를 적어주세요.</SmallText>
-        <Promise />
+        <SmallText>{userData.nickName}님에게 응원의 편지를 적어주세요.</SmallText>
+        <WishLabel info={userData.wish} />
       </Wrapper>
 
-      <MyRabbit />
+      <MyRabbit info={userData.rabbit} />
 
-      <ButtonItem onClick={() => navigate('send/', { state: nickName })}>
+      <ButtonItem onClick={() => navigate('send/', { state: userData.nickName })}>
         편지 작성하기
       </ButtonItem>
     </Container>
+    </>
   )
 }
 

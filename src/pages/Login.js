@@ -13,10 +13,9 @@ import Logo from '../components/Logo'
 import Container from '../components/Container'
 import setMetaTags from '../utils/meta'
 import { SITE_NAME } from '../utils/constant'
-import { Input, useForm, validateLogin } from 'features/users'
+import { BottomText, Input, useForm, validateLogin } from 'features/users'
 import useHttp from 'hooks/use-http'
 import { LoadingModal } from 'features/ui'
-import BottomText from 'features/users/label/BottomLink'
 
 const LOGIN_INIT_VALUES = {
   userID: '',
