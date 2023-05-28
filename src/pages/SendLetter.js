@@ -11,6 +11,15 @@ import setMetaTags from '../utils/meta'
 import { SITE_NAME } from '../utils/constant'
 import { freeLoading, setLoading } from '../utils/reducers/loadingState'
 
+/*
+TODO: Component 구조 개선 작업
+- 현재 재사용성이 없는 Content 컴포넌트가 분리되었음
+- 대량의 Prop Chain이 발생되, Logic 개선이 필요
+
+TODO: Complete 모달 분리 작업
+- Complete 모달을 따로 분리하고, portal을 활용해 최상위로 전송해야 함
+*/
+
 function SendLetter() {
   const [money, setMoney] = React.useState(MONEY_INIT_STATE)
   const [isSended, setSend] = React.useState(false)
