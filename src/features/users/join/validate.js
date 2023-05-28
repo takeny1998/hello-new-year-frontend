@@ -1,7 +1,6 @@
 export const validate = ({ userID, nickname, password, passwordRepeat }) => {
     const errors = {};
 
-    console.log(userID, nickname, password, passwordRepeat);
     /*  
       아이디 형식을 검증하기 위한 정규표현식
       1. 영문(대, 소문자), 숫자만 입력했는지 판별한다.
@@ -35,8 +34,8 @@ export const validate = ({ userID, nickname, password, passwordRepeat }) => {
       2. 영문, 숫자, 기호 중 2가지 이상을 조합했는지 판별한다.
       3. 길이가 8자 이상, 20자 이하인지 판별한다.
     */
-  
     const passwrodRegex = /^(?=.*[a-zA-Z])(?=.*\d|.*\p{P})(?!.*\s).{8,20}$/u;
+    
     if (password.length === 0 || passwordRepeat.length === 0)  {
       errors.password = '비밀번호가 입력되지 않았습니다.';
     } else if (password !== passwordRepeat) { 

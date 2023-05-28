@@ -10,7 +10,7 @@ const useHttp = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const sendRequest = useCallback( async (url, requestOptions, applyData) => {
+    const sendRequest = useCallback( async (url, requestOptions, onComplete) => {
         setIsLoading(true);
         try {
             const res = await fetch(
@@ -27,7 +27,7 @@ const useHttp = () => {
             }
             
             const resData = await res.json();
-            applyData(resData.result);
+            onComplete(resData.result);
 
         } catch (err) {
             /*

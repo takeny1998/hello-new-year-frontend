@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { SubTitle, Wrapper } from './Main'
 
-import { Input, useForm } from 'features/users'
+import { Input, useForm, validateJoin } from 'features/users'
 import { Button, Link, LoadingModal } from 'features/ui'
 
 import Logo from '../components/Logo'
@@ -13,8 +13,6 @@ import setMetaTags from '../utils/meta'
 import { SITE_NAME } from '../utils/constant'
 import { BottomText } from './Login'
 import useHttp from 'hooks/use-http'
-
-import { validate } from 'features/users'
 
 const JOIN_INIT_VALUES = {
   userID : '',
@@ -30,18 +28,18 @@ function CreateAccount() {
 
   const navigate = useNavigate();
 
-  const {isLoading, sendRequest} = useHttp();
+  const {isLoading, sendRequest: submit} = useHttp();
 
   const { changeHandler, submitHandler } = useForm(JOIN_INIT_VALUES);
 
   
-  const submit = (values) => {
+  const attemptJoin = ({ userID, password, nickname }) => {
     const complete = ({ nickName }) => {
       alert(`${nickName}님, 가입을 축하합니다.\n다시 로그인해 주세요.`);
       navigate('/');
     };
 
-    sendRequest(
+    submit(
       '/api/users/join',
       {
         method: 'POST',
@@ -49,9 +47,9 @@ function CreateAccount() {
           'Content-Type': 'application/json',
         },
         body: {
-          userID: values.userID,
-          password: values.password,
-          nickName: values.nickname,
+          userID: userID,
+          password: password,
+          nickName: nickname,
         },
       },
       complete
@@ -98,7 +96,7 @@ function CreateAccount() {
         <Wrapper>
           <Button onClick={
             (event) => {
-              submitHandler(event, submit, validate);
+              submitHandler(event, attemptJoin, validateJoin);
             }
           }>
             회원가입
