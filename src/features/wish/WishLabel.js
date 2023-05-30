@@ -1,36 +1,33 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
-import PromiseBg from 'assets/images/promise.png'
-import { FONT_COLOR_OPTION, FONT_OPTION } from 'utils/constant'
-import React from 'react';
+import PromiseBg from "assets/images/promise.png";
+import { FONT_COLOR_OPTION, FONT_OPTION } from "utils/constant";
+import React, { useEffect, useRef } from "react";
 
-function WishLabel({ info, changeHandler, editable = false}) {
+function WishLabel({ info, changeHandler, editable = false }) {
+  const { value, font, color } = info;
 
-    const {value, font, color} = info;
-
-    const onPressEnterHandler = (event) => {
-      if (event.key === 'Enter') {
-        document.execCommand('insertLineBreak')
-        event.preventDefault()
-        }
+  const onPressEnterHandler = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
     }
-    
-    return (
-    <Container>
-        <InputArea 
-          suppressContentEditableWarning
-          contentEditable={editable ? true : false}
-          onKeyDown={editable ? onPressEnterHandler : null}
-          onInput={editable ? changeHandler : null}
+  };
 
-          font={FONT_OPTION[font]}
-          color={FONT_COLOR_OPTION[color]}
-        
-          placeholder={value}
-        />
-        <img src={PromiseBg} alt="" />
+  return (
+    <Container>
+      <InputArea
+        suppressContentEditableWarning
+        contentEditable={editable ? true : false}
+        onKeyDown={editable ? onPressEnterHandler : null}
+        onInput={editable ? changeHandler : null}
+        font={FONT_OPTION[font]}
+        color={FONT_COLOR_OPTION[color]}
+      >
+        {value}
+      </InputArea>
+      <img src={PromiseBg} alt="" />
     </Container>
-    )
+  );
 }
 
 const Container = styled.div`
@@ -43,7 +40,7 @@ const Container = styled.div`
     height: auto;
     object-fit: cover;
   }
-`
+`;
 
 const InputArea = styled.div`
   position: absolute;
@@ -68,11 +65,6 @@ const InputArea = styled.div`
 
   overflow-y: hidden;
 
-  // placeholder
-  &:empty:before {
-    content: attr(placeholder);
-  };
-
   // focus outline
   &:focus {
     outline: 2px solid var(--pink-200);
@@ -81,6 +73,6 @@ const InputArea = styled.div`
   @media (min-width: 500px) {
     font-size: 21px;
   }
-`
+`;
 
-export default React.memo(WishLabel)
+export default WishLabel;

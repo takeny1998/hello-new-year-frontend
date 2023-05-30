@@ -1,47 +1,52 @@
-import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
-import { logout, setState } from '../../utils/reducers/loginState'
+import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, setState } from "../../utils/reducers/loginState";
 
-import { Wrapper } from '../Main'
+import { Wrapper } from "../Main";
 
-import Logo from '../../components/Logo'
-import MaterialIcon from '../../components/MaterialIcon'
+import Logo from "../../components/Logo";
+import MaterialIcon from "../../components/MaterialIcon";
 
-import { WishLabel } from 'features/wish'
+import { WishLabel } from "features/wish";
 
-import SmallButtonItem from '../../components/SmallButtonItem'
-import Container from '../../components/Container'
-import { useNavigate } from 'react-router-dom'
-import React, { useEffect, useMemo, useState } from 'react'
-import axios from 'axios'
-import { ResponseError } from '../../utils/error'
-import MoneyInfo from './LoginMain/MoneyInfo'
-import { setInfo } from '../../utils/reducers/infoState'
-import MyRabbit from '../../components/MyRabbit'
-import { useLocation } from 'react-router-dom'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
-import HelpModal, { Content, SmallContent } from '../../components/HelpModal'
+import SmallButtonItem from "../../components/SmallButtonItem";
+import Container from "../../components/Container";
+import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import { ResponseError } from "../../utils/error";
+import MoneyInfo from "./LoginMain/MoneyInfo";
+import { setInfo } from "../../utils/reducers/infoState";
+import MyRabbit from "../../components/MyRabbit";
+import { useLocation } from "react-router-dom";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import HelpModal, { Content, SmallContent } from "../../components/HelpModal";
 
-
-
-import { freeLoading, setLoading } from '../../utils/reducers/loadingState'
-import Loading from '../../components/Loading'
-import useHttp from '../../hooks/use-http'
-import { CUSTOM_INIT_STATE, RABBIT_INIT_STATE, WISH_INIT_STATE } from '../../utils/constant'
-import { ButtonWrapper, LetterModal, LoadingModal } from 'features/ui'
-import { useUserData } from 'features/users'
+import { freeLoading, setLoading } from "../../utils/reducers/loadingState";
+import Loading from "../../components/Loading";
+import useHttp from "../../hooks/use-http";
+import {
+  CUSTOM_INIT_STATE,
+  RABBIT_INIT_STATE,
+  WISH_INIT_STATE,
+} from "../../utils/constant";
+import {
+  ButtonWrapper,
+  LetterModal,
+  LoadingModal,
+  MainContainer,
+} from "features/ui";
+import { useUserData } from "features/users";
 
 function LoginMain() {
-  const { uuid } = useSelector(state => state.loginState)
-  const dispatch = useDispatch()
-
+  const { uuid } = useSelector((state) => state.loginState);
+  const dispatch = useDispatch();
 
   const [isLetterOpen, setLetterOpen] = useState(true);
 
   const letterHandler = () => {
     setLetterOpen(false);
   };
-
 
   //   money: 0,
   //   wish: WISH_INIT_STATE,
@@ -70,7 +75,7 @@ function LoginMain() {
   //     setUserData({money: data.money, wish: wishInfo, rabbit: rabbitInfo});
   //   }
 
-  //   fetch(`/api/rabbit/mypage/${uuid}`, 
+  //   fetch(`/api/rabbit/mypage/${uuid}`,
   //     {
   //       headers: {
   //         Authorization: `Bearer ${token}`,
@@ -79,21 +84,17 @@ function LoginMain() {
   //     applyUserData
   //   );
   // }, [uuid, token]);
-  const { isLoading, userData, fetchUserData } = useUserData();
+  const { isFetching, userData, fetchUserData } = useUserData();
 
   useEffect(() => {
     fetchUserData(uuid);
-  }, [uuid])
+  }, [uuid]);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
-    <Container alt>
-      {
-        isLoading && <LoadingModal />
-      }
-      {
-        isLetterOpen && <LetterModal onComfirm={letterHandler} />
-      }
+    <MainContainer backgroundIndex={userData.backgroundIndex}>
+      {isFetching && <LoadingModal />}
+      {isLetterOpen && <LetterModal onComfirm={letterHandler} />}
       {/* {parseInt(timeDiff[0]) === 0 &&
       parseInt(timeDiff[1]) === 0 &&
       parseInt(timeDiff[2]) === 0 ? (
@@ -106,7 +107,7 @@ function LoginMain() {
         <ButtonWrapper>
           <CopyToClipboard
             text={`${window.location.href}letter/${uuid}`}
-            onCopy={() => alert('링크가 성공적으로 복사되었습니다.')}
+            onCopy={() => alert("링크가 성공적으로 복사되었습니다.")}
           >
             <SmallButtonItem background="--white" color="--pink">
               <MaterialIcon iconName="link" color="--pink" /> 링크 복사
@@ -127,7 +128,7 @@ function LoginMain() {
         </ButtonWrapper>
 
         <Wrapper gap={0.5}>
-          <WishLabel info={userData.wish} />
+          <WishLabel info={userData.wishInfo} />
           <SmallTextButton onClick={() => {}}>
             혹시 설명이 필요하신가요? <Focus>도움말 열기</Focus>
           </SmallTextButton>
@@ -135,7 +136,7 @@ function LoginMain() {
 
         <MoneyInfo />
 
-        <MyRabbit info={userData.rabbit} />
+        <MyRabbit info={userData.rabbitInfo} />
 
         <Wrapper gap={2}>
           {/* <Label>
@@ -150,10 +151,9 @@ function LoginMain() {
         </Wrapper>
       </Wrapper>
       <Loading />
-    </Container>
-  )
+    </MainContainer>
+  );
 }
-
 
 const Label = styled.div`
   width: 100%;
@@ -170,7 +170,7 @@ const Label = styled.div`
   background: white;
   color: var(--brown);
   padding: 18px;
-`
+`;
 
 export const Copyright = styled.div`
   font-family: nanumRound;
@@ -179,16 +179,16 @@ export const Copyright = styled.div`
   text-align: center;
   color: var(--brown-100);
   white-space: keep-all;
-`
+`;
 
 const SmallTextButton = styled(Content)`
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-`
+`;
 
 const Focus = styled.span`
   color: var(--pink);
   font-weight: 700;
-`
-export default LoginMain
+`;
+export default LoginMain;

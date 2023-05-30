@@ -3,10 +3,10 @@ import styled from 'styled-components'
 import LinkItem from './LinkItem'
 import PropTypes from 'prop-types'
 
-function Logo({ sx = 3 }) {
+function Logo({ sx = 3, target = "/" }) {
   return (
     <Container sx={sx}>
-      <LinkItem target="/">
+      <LinkItem target={target}>
         <img src={logo} alt="" />
       </LinkItem>
     </Container>
@@ -15,6 +15,7 @@ function Logo({ sx = 3 }) {
 
 Logo.propTypes = {
   sx: PropTypes.number,
+  target: PropTypes.string,
 }
 
 const Container = styled.div`

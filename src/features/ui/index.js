@@ -1,3 +1,5 @@
+import MainContainer from "./container/MainContainer";
+
 import LoadingModal from "./modal/LoadingModal";
 import LetterModal from "./modal/LetterModal";
 
@@ -7,7 +9,10 @@ import ButtonWrapper from "./Button/ButtonWrapper";
 import Link from "./LinkWrapper";
 
 export {
-  LoadingModal, LetterModal, 
-  Button, ButtonWrapper,
-  Link
+  MainContainer,
+  LoadingModal,
+  LetterModal,
+  Button,
+  ButtonWrapper,
+  Link,
 };

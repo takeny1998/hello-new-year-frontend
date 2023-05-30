@@ -11,6 +11,7 @@ import Logo from '../../components/Logo'
 
 import MoneyButton from '../../components/MoneyButton'
 import { Input } from 'features/users'
+import { useParams } from 'react-router-dom'
 
 function SendContent({
   nickName,
@@ -20,10 +21,12 @@ function SendContent({
   setContent,
   onClick,
 }) {
+  const { uuid } = useParams()
+
   return (
     <>
       <Wrapper gap={2}>
-        <Logo sx={1.75} />
+        <Logo sx={1.75} target={`/letter/${uuid}`} />
 
         <SmallText>{nickName}님을 응원하는 마음만큼 용돈을 주세요!</SmallText>
 

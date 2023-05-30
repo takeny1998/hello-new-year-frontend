@@ -18,6 +18,9 @@ TODO: Component 구조 개선 작업
 
 TODO: Complete 모달 분리 작업
 - Complete 모달을 따로 분리하고, portal을 활용해 최상위로 전송해야 함
+
+TODO: Side-Effect 분리 작업
+- 현재 돈을 선택하는 부분이 Component 최상위에 실행되고 있어 개선이 필요함
 */
 
 function SendLetter() {

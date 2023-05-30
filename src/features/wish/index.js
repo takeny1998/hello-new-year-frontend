@@ -1,3 +1,3 @@
 import WishLabel from "./WishLabel";
 
-export {WishLabel};
+export { WishLabel };
