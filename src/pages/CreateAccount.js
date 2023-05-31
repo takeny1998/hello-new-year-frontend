@@ -1,113 +1,128 @@
-import React from 'react'
+import { useEffect } from "react";
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
-import { SubTitle, Wrapper } from './Main'
+import { SubTitle, Wrapper } from "./Main";
 
-import { BottomText, Input, useForm, validateJoin } from 'features/users'
-import { Button, Link, LoadingModal } from 'features/ui'
+import { BottomText, Input } from "features/users";
+import { Button, Link, LoadingModal } from "features/ui";
 
-import Logo from '../components/Logo'
-import Container from '../components/Container'
-import setMetaTags from '../utils/meta'
-import { SITE_NAME } from '../utils/constant'
-import useHttp from 'hooks/use-http'
-
-const JOIN_INIT_VALUES = {
-  userID : '',
-  nickname: '',
-  password: '',
-  passwordRepeat: '',
-}
+import Logo from "../components/Logo";
+import Container from "../components/Container";
+import setMetaTags from "../utils/meta";
+import { SITE_NAME } from "../utils/constant";
+import useHttp from "hooks/use-http";
+import { useAuthInput, validatePassword } from "features/auth";
+import { validateNickName, validateUserID } from "features/auth";
 
 function CreateAccount() {
-  React.useEffect(() => {
-    setMetaTags(`회원가입 - ${SITE_NAME}`)
+  useEffect(() => {
+    setMetaTags(`회원가입 - ${SITE_NAME}`);
   }, []);
 
   const navigate = useNavigate();
 
-  const {isLoading, sendRequest: submit} = useHttp();
+  const { isLoading, sendRequest: submit } = useHttp();
 
-  const { changeHandler, submitHandler } = useForm(JOIN_INIT_VALUES);
+  const {
+    value: userID,
+    isValid: userIDIsValid,
+    error: userIDError,
+    valueChangeHandler: userIDChangeHandler,
+    inputBlurHandler: userIDBlurhandler,
+  } = useAuthInput(validateUserID);
 
-  
-  const attemptJoin = ({ userID, password, nickname }) => {
+  const {
+    value: nickName,
+    isValid: nickNameIsValid,
+    error: nickNameError,
+    valueChangeHandler: nickNameChangeHandler,
+    inputBlurHandler: nickNameBlurhandler,
+  } = useAuthInput(validateNickName);
+
+  const {
+    value: password,
+    isValid: passwordIsValid,
+    error: passwordError,
+    valueChangeHandler: passwordChangeHandler,
+    inputBlurHandler: passwordBlurhandler,
+  } = useAuthInput(validatePassword);
+
+  const formIsValid = userIDIsValid && nickNameIsValid && passwordIsValid;
+
+  const submitHandler = (event) => {
     const complete = ({ nickName }) => {
       alert(`${nickName}님, 가입을 축하합니다.\n다시 로그인해 주세요.`);
-      navigate('/');
+      navigate("/");
     };
 
-    submit(
-      '/api/users/join',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    if (formIsValid) {
+      submit(
+        "/api/users/join",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: {
+            userID: userID,
+            password: password,
+            nickName: nickName,
+          },
         },
-        body: {
-          userID: userID,
-          password: password,
-          nickName: nickname,
-        },
-      },
-      complete
-    );
+        complete
+      );
+    }
   };
 
   return (
     <>
-    {isLoading && <LoadingModal />}
-    <Container>
-      <Wrapper gap={3}>
-        <Logo />
-        <Wrapper gap={1.2}>
-          <SubTitle>환영합니다!</SubTitle>
-          <Input
-            type="text"
-            name="userID"
-            placeholder="아이디"
-            autocomplete="off"
-            onChange={changeHandler}
-          />
-          <Input
-            type="text"
-            name="nickname"
-            placeholder="닉네임"
-            autocomplete="off"
-            onChange={changeHandler}
-          />
-          <Input
-            type="password"
-            name="password"
-            placeholder="비밀번호"
-            autocomplete="off"
-            onChange={changeHandler}
-          />
-          <Input
-            type="password"
-            name="passwordRepeat"
-            placeholder="비밀번호 확인"
-            autocomplete="off"
-            onChange={changeHandler}
-          />
+      {isLoading && <LoadingModal />}
+      <Container>
+        <Wrapper gap={3}>
+          <Logo />
+          <Wrapper gap={1.2}>
+            <SubTitle>환영합니다!</SubTitle>
+            <Input
+              type="text"
+              name="userID"
+              placeholder="아이디"
+              value={userID}
+              error={userIDError}
+              onChange={userIDChangeHandler}
+              onBlur={userIDBlurhandler}
+            />
+            <Input
+              type="text"
+              name="nickname"
+              placeholder="닉네임"
+              value={nickName}
+              error={nickNameError}
+              onChange={nickNameChangeHandler}
+              onBlur={nickNameBlurhandler}
+            />
+            <Input
+              type="password"
+              name="password"
+              placeholder="비밀번호"
+              value={password}
+              error={passwordError}
+              onChange={passwordChangeHandler}
+              onBlur={passwordBlurhandler}
+            />
+          </Wrapper>
+          <Wrapper>
+            <Button onClick={submitHandler} disabled={!formIsValid}>
+              회원가입
+            </Button>
+            <Link target="/login">
+              <BottomText>계정이 있으신가요? 로그인</BottomText>
+            </Link>
+          </Wrapper>
         </Wrapper>
-        <Wrapper>
-          <Button onClick={
-            (event) => {
-              submitHandler(event, attemptJoin, validateJoin);
-            }
-          }>
-            회원가입
-          </Button>
-          <Link target="/login">
-            <BottomText>계정이 있으신가요? 로그인</BottomText>
-          </Link>
-        </Wrapper>
-      </Wrapper>
-    </Container>
+      </Container>
     </>
-  )
+  );
 }
 
-export default CreateAccount
+export default CreateAccount;

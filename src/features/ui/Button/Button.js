@@ -1,20 +1,30 @@
-import styled from 'styled-components'
-import PropTypes from 'prop-types'
+import styled from "styled-components";
+import PropTypes from "prop-types";
 
-function Button({ background = '--pink-200', onClick, children }) {
+function Button({
+  onClick,
+  disabled = false,
+  background = "--pink-200",
+  children,
+}) {
   return (
-    <ButtonLayout background={background} onClick={onClick}>
+    <ButtonLayout
+      disabled={disabled}
+      type="button"
+      background={background}
+      onClick={onClick}
+    >
       {children}
     </ButtonLayout>
-  )
+  );
 }
 
 Button.propTypes = {
+  onClick: PropTypes.func.isRequired,
   background: PropTypes.string,
-  onClick: PropTypes.func,
-}
+};
 
-const ButtonLayout = styled.div`
+const ButtonLayout = styled.button`
   position: relative;
   display: flex;
   justify-content: center;
@@ -30,10 +40,16 @@ const ButtonLayout = styled.div`
   font-weight: bold;
   font-size: 18px;
 
-  background: var(${props => props.background});
+  background: var(${(props) => props.background});
   color: var(--brown);
 
   cursor: pointer;
-`
 
-export default Button
+  :disabled {
+    background-color: #ccc;
+    color: #292929;
+    cursor: not-allowed;
+  }
+`;
+
+export default Button;

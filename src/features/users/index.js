@@ -7,11 +7,4 @@ import { validate as validateJoin } from "./join/validate";
 
 import useUserData from "./use-user-data";
 
-export {
-    Input,
-    useForm,
-    BottomText,
-    validateLogin,
-    validateJoin,
-    useUserData
-};
+export { Input, useForm, BottomText, validateLogin, validateJoin, useUserData };

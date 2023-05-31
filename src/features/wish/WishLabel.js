@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 import PromiseBg from "assets/images/promise.png";
 import { FONT_COLOR_OPTION, FONT_OPTION } from "utils/constant";
-import React, { useEffect, useRef } from "react";
+import React from "react";
 
 function WishLabel({ info, changeHandler, editable = false }) {
   const { value, font, color } = info;

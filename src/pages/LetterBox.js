@@ -1,37 +1,37 @@
-import React, { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Logo from '../components/Logo'
-import Container from '../components/Container'
-import ButtonItem from '../components/ButtonItem'
-import MoneyInfo from './Letterbox/MoneyInfo'
-import Letter from './Letterbox/Letter'
-import styled from 'styled-components'
-import { Wrapper } from './Main'
-import SmallButtonItem from '../components/SmallButtonItem'
-import axios from 'axios'
-import { useDispatch, useSelector } from 'react-redux'
-import { ResponseError } from '../utils/error'
-import { logout } from '../utils/reducers/loginState'
-import setMetaTags from '../utils/meta'
-import { SITE_NAME } from '../utils/constant'
+import React, { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
+import Container from "../components/Container";
+import ButtonItem from "../components/ButtonItem";
+import MoneyInfo from "./Letterbox/MoneyInfo";
+import Letter from "./Letterbox/Letter";
+import styled from "styled-components";
+import { Wrapper } from "./Main";
+import SmallButtonItem from "../components/SmallButtonItem";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { ResponseError } from "../utils/error";
+import { logout } from "../utils/reducers/loginState";
+import setMetaTags from "../utils/meta";
+import { SITE_NAME } from "../utils/constant";
 
 function LetterBox() {
   React.useEffect(() => {
-    setMetaTags(`받은 편지함 - ${SITE_NAME}`)
-  }, [])
+    setMetaTags(`받은 편지함 - ${SITE_NAME}`);
+  }, []);
 
-  const { uuid, token } = useSelector(state => state.loginState)
+  const { uuid, token } = useSelector((state) => state.loginState);
 
-  const [letterData, setLetterData] = React.useState([])
+  const [letterData, setLetterData] = React.useState([]);
 
-  const [page, setPage] = React.useState(0)
-  const [totalPages, setTotalPage] = React.useState(0)
-  const [isEndPage, setIsEnd] = React.useState(true)
+  const [page, setPage] = React.useState(0);
+  const [totalPages, setTotalPage] = React.useState(0);
+  const [isEndPage, setIsEnd] = React.useState(true);
 
-  const ITEMS_PER_PAGE = 9
+  const ITEMS_PER_PAGE = 9;
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const fetch = useCallback(async () => {
     try {
@@ -39,36 +39,34 @@ function LetterBox() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-
-      console.log(res)
+      });
       switch (res.status) {
         case 200:
-          setLetterData(res.data.result)
-          setIsEnd(res.data.result.length <= ITEMS_PER_PAGE ? true : false)
-          setTotalPage(Math.ceil(res.data.result.length / ITEMS_PER_PAGE))
-          break
+          setLetterData(res.data.result);
+          setIsEnd(res.data.result.length <= ITEMS_PER_PAGE ? true : false);
+          setTotalPage(Math.ceil(res.data.result.length / ITEMS_PER_PAGE));
+          break;
         default:
-          throw new ResponseError('잘못된 응답입니다.', res)
+          throw new ResponseError("잘못된 응답입니다.", res);
       }
     } catch (err) {
-      const res = err.response
+      const res = err.response;
 
       switch (res.status) {
         case 401:
-          alert('세션이 만료되었습니다. 다시 로그인해주세요.')
-          dispatch(logout())
-          navigate('/login')
-          break
+          alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+          dispatch(logout());
+          navigate("/login");
+          break;
         case 404:
-          alert('받은 편지가 없습니다.')
-          navigate('/')
-          break
+          alert("받은 편지가 없습니다.");
+          navigate("/");
+          break;
         default:
-          alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
+          alert("서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.");
       }
     }
-  }, [uuid, token, page])
+  }, [uuid, token, page]);
 
   // const fetch = () => {
   //   const res = {
@@ -270,16 +268,16 @@ function LetterBox() {
   // }
 
   const toNextPage = () => {
-    setPage(prev => prev + 1)
+    setPage((prev) => prev + 1);
     if (page + 2 == totalPages) {
-      setIsEnd(true)
+      setIsEnd(true);
     }
-  }
+  };
 
   React.useEffect(() => {
-    fetch()
-  }, [])
-  console.log(letterData)
+    fetch();
+  }, []);
+  console.log(letterData);
   return (
     <Container>
       <Wrapper gap={2}>
@@ -299,7 +297,7 @@ function LetterBox() {
                   author={item.author}
                   content={item.content}
                 />
-              )
+              );
             })}
         </LetterWrapper>
         {isEndPage ? null : (
@@ -312,9 +310,9 @@ function LetterBox() {
           </SmallButtonItem>
         )}
       </Wrapper>
-      <ButtonItem onClick={() => navigate('/')}>홈으로</ButtonItem>
+      <ButtonItem onClick={() => navigate("/")}>홈으로</ButtonItem>
     </Container>
-  )
+  );
 }
 
 const LetterWrapper = styled.div`
@@ -323,5 +321,5 @@ const LetterWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
 
   gap: 36px;
-`
-export default LetterBox
+`;
+export default LetterBox;
