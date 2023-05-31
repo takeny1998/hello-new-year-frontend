@@ -12,8 +12,12 @@ import Container from "../components/Container";
 import setMetaTags from "../utils/meta";
 import { SITE_NAME } from "../utils/constant";
 import useHttp from "hooks/use-http";
-import { useAuthInput, validatePassword } from "features/auth";
-import { validateNickName, validateUserID } from "features/auth";
+import { useAuthInput } from "features/auth";
+import {
+  validateNickName,
+  validateUserID,
+  validatePassword,
+} from "features/auth/join";
 
 function CreateAccount() {
   useEffect(() => {
