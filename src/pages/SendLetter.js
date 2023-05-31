@@ -1,114 +1,161 @@
-import Container from '../components/Container'
-import Logo from '../components/Logo'
-import React from 'react'
-import { useLocation, useParams } from 'react-router-dom'
-import SendContent from './SendLetter/SendContent'
-import SendComplete from './SendLetter/SendComplete'
-import axios from 'axios'
-import { useDispatch, useSelector } from 'react-redux'
-import { ResponseError } from '../utils/error'
-import setMetaTags from '../utils/meta'
-import { SITE_NAME } from '../utils/constant'
-import { freeLoading, setLoading } from '../utils/reducers/loadingState'
+import Container from "../components/Container";
+import Logo from "../components/Logo";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import setMetaTags from "../utils/meta";
+import { SITE_NAME } from "../utils/constant";
+import styled from "styled-components";
+
+import Money50000 from "assets/images/money-50000.png";
+import Money10000 from "assets/images/money-10000.png";
+import Money5000 from "assets/images/money-5000.png";
+import Money1000 from "assets/images/money-1000.png";
+import { SmallText } from "./InviteLetter";
+import { Wrapper } from "./Main";
+import MoneyButton from "components/MoneyButton";
+import { validate } from "features/letter/send-letter";
+import { Input } from "features/users";
+import Letter from "components/Letter";
+import { Button, LoadingModal } from "features/ui";
+import useHttp from "hooks/use-http";
+import ErrorText from "features/ui/text/ErrorText";
 
 /*
-TODO: Component 구조 개선 작업
-- 현재 재사용성이 없는 Content 컴포넌트가 분리되었음
-- 대량의 Prop Chain이 발생되, Logic 개선이 필요
-
 TODO: Complete 모달 분리 작업
 - Complete 모달을 따로 분리하고, portal을 활용해 최상위로 전송해야 함
 
 TODO: Side-Effect 분리 작업
 - 현재 돈을 선택하는 부분이 Component 최상위에 실행되고 있어 개선이 필요함
+
+TODO: Money Component 개선 작업
+- 현재 5000, 10000, .. 등 MoneyButton이 Hard Coding 되있음
+- Money image Asset을 Component 내로 옮겨야 함
 */
 
 function SendLetter() {
-  const [money, setMoney] = React.useState(MONEY_INIT_STATE)
-  const [isSended, setSend] = React.useState(false)
+  const [money, setMoney] = useState();
+  const [content, setContent] = useState("");
+  const [author, setAuthor] = useState("");
+  const { isLoading, sendRequest: submit } = useHttp();
 
-  const [author, setAuthor] = React.useState('')
-  const [content, setContent] = React.useState('')
+  const [errorMessage, setErrorMessage] = useState();
 
-  const { state } = useLocation()
-  const { uuid } = useParams()
-  const dispatch = useDispatch()
+  const { state: nickName } = useLocation();
+  const { uuid } = useParams();
+  const navigate = useNavigate();
 
-  const selectMoney = moneyAmount => {
-    var copy = Object.assign({}, MONEY_INIT_STATE)
-    copy[moneyAmount] = true
-    setMoney(copy)
-  }
+  useEffect(() => {
+    setMetaTags(`${nickName}님에게 편지쓰기 - ${SITE_NAME}`);
+  }, []);
 
-  React.useEffect(() => {
-    setMetaTags(`${state}님에게 편지쓰기 - ${SITE_NAME}`)
-  }, [])
+  const authorChangeHandler = (event) => {
+    setAuthor(event.target.value);
+  };
 
-  const getSelectedMoney = () => {
-    return Object.keys(money).find(key => money[key] === true)
-  }
+  const moneyChangeHandler = (value) => {
+    setMoney(value);
+  };
 
-  const attemptSend = React.useCallback(async () => {
-    const selectedMoney = getSelectedMoney()
-    if (selectedMoney === undefined) {
-      alert('용돈을 선택해주세요.')
-    } else if (author.length === 0) {
-      alert('보내시는 분의 이름을 적어주세요.')
-    } else if (content.length < 5) {
-      alert('내용을 적어도 5자 이상 써주세요.')
-    } else if (content.length > 100) {
-      alert('편지는 최대 100자까지 쓸 수 있습니다.')
+  const contentChangeHandler = (event) => {
+    setContent(event.target.innerText);
+  };
+
+  const submitHandler = (event) => {
+    const completeHander = () => {
+      alert("편지 전송에 성공했습니다.");
+      navigate("complete/");
+    };
+
+    setErrorMessage("");
+    const errors = validate(content, money, author);
+    const formIsValid = Object.keys(errors).length === 0;
+
+    if (formIsValid) {
+      submit(
+        `/api/letter/${uuid}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: { author, content, money },
+        },
+        completeHander
+      );
     } else {
-      try {
-        dispatch(setLoading())
-        const res = await axios.post(`/api/letter/${uuid}`, {
-          author: author,
-          content: content,
-          money: selectedMoney,
-        })
-        dispatch(freeLoading())
-
-        switch (res.status) {
-          case 200:
-            setSend(true)
-            break
-          default:
-            throw new ResponseError('잘못된 응답입니다.', res)
-        }
-      } catch (err) {
-        dispatch(freeLoading())
-        const res = err.ResponseError
-        switch (res.status) {
-          default:
-            alert('서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.')
-        }
+      let errorMessage = "";
+      for (const key in errors) {
+        errorMessage += errors[key] + "\n";
       }
+      setErrorMessage(errorMessage);
     }
-  }, [author, content, uuid, getSelectedMoney])
+  };
 
   return (
-    <Container>
-      {isSended ? (
-        <SendComplete />
-      ) : (
-        <SendContent
-          nickName={state}
-          money={money}
-          selectMoney={selectMoney}
-          setContent={setContent}
-          setAuthor={setAuthor}
-          onClick={attemptSend}
+    <>
+      {isLoading && <LoadingModal />}
+      <Container>
+        <Wrapper gap={2}>
+          <Logo sx={1.75} target={`/letter/${uuid}`} />
+
+          <SmallText>{nickName}님을 응원하는 마음만큼 용돈을 주세요!</SmallText>
+
+          <MoneyWrapper>
+            <MoneyButton
+              src={Money50000}
+              isActive={money === 50000}
+              onClick={() => moneyChangeHandler(50000)}
+            />
+            <MoneyButton
+              src={Money10000}
+              isActive={money === 10000}
+              onClick={() => moneyChangeHandler(10000)}
+            />
+            <MoneyButton
+              src={Money5000}
+              isActive={money === 5000}
+              onClick={() => moneyChangeHandler(5000)}
+            />
+            <MoneyButton
+              src={Money1000}
+              isActive={money === 1000}
+              onClick={() => moneyChangeHandler(1000)}
+            />
+          </MoneyWrapper>
+        </Wrapper>
+        <Input
+          type="text"
+          name="userID"
+          placeholder="작성자"
+          value={author}
+          onChange={authorChangeHandler}
         />
-      )}
-    </Container>
-  )
-}
+        <SmallText>편지 내용은 최대 100자까지 작성해주세요!</SmallText>
+        <Letter editable={true} onChange={contentChangeHandler} />
 
-export const MONEY_INIT_STATE = {
-  50000: false,
-  10000: false,
-  5000: false,
-  1000: false,
+        {<ErrorText>{errorMessage}</ErrorText>}
+        <Button onClick={submitHandler}>보내기</Button>
+      </Container>
+    </>
+  );
 }
+export const SmallInput = styled(Input)`
+  width: max(70%, 260px);
+  padding: 14px;
 
-export default SendLetter
+  font-weight: 800;
+  font-size: max(0.8rem, 14px);
+  borderRadius: 9999px
+  filter: none;
+`;
+
+const MoneyWrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: max(1rem, 18px);
+  > div {
+    position: relative;
+  }
+`;
+
+export default SendLetter;

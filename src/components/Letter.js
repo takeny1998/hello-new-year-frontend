@@ -1,37 +1,34 @@
-import styled from 'styled-components'
-import PropTypes from 'prop-types'
+import styled from "styled-components";
+import PropTypes from "prop-types";
 
-import LetterBg from '../assets/images/letter.png'
-import { event } from 'jquery'
+import LetterBg from "../assets/images/letter.png";
 
-function Letter({ editable = false, defaultText, setValue }) {
+function Letter({ editable = false, defaultText, onChange }) {
   return (
     <Container>
       <div
         id="letter-content"
-        onKeyDown={event => {
-          if (event.key === 'Enter') {
-            document.execCommand('insertLineBreak')
-            event.preventDefault()
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            document.execCommand("insertLineBreak");
+            event.preventDefault();
           }
         }}
-        onInput={event => {
-          setValue(event.target.outerText)
-        }}
+        onInput={onChange}
         contentEditable={editable ? true : false}
       >
         {defaultText ? defaultText : null}
       </div>
       <img src={LetterBg} alt="" />
     </Container>
-  )
+  );
 }
 
 Letter.propTypes = {
   editable: PropTypes.bool,
   defaultText: PropTypes.string,
   setValue: PropTypes.func,
-}
+};
 
 const Container = styled.div`
   position: relative;
@@ -73,6 +70,6 @@ const Container = styled.div`
   div:focus {
     outline: 2px solid var(--pink-200);
   }
-`
+`;
 
-export default Letter
+export default Letter;
