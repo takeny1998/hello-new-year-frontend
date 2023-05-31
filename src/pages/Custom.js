@@ -38,6 +38,11 @@ const Custom = () => {
     fetchUserData(uuid);
   }, [uuid]);
 
+  /*
+    TODO: Custom 검증 Logic 추가하기
+    - 현재 Custom form에 값 검증 코드가 없음
+    - 백엔드 개발자와 유효값을 정한 뒤, 개발 필요
+  */
   const submitHandler = async () => {
     const complete = ({ nickName }) => {
       alert(`${nickName}님의 설정이 저장되었습니다.`);
