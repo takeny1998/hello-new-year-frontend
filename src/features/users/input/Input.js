@@ -1,6 +1,18 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
 
+/*
+TODO: password view icon 만들기
+
+PC web browser(Edge)에서는 password 입력할 때,
+입력값을 확인할 수 있는 view 버튼이 존재함.
+
+그런데 모바일 safari나 chrome같은 타 browser는
+view 버튼이 존재하지 않아 불편함 발생.
+
+type이 password일 떄, view 버튼이 보이는 input을 새로
+만들도록 하자.
+*/
 const Input = ({
   type,
   name,
